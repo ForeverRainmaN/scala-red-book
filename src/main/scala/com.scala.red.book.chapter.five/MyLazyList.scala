@@ -90,8 +90,18 @@ private enum LazyList[+A]:
       case (Cons(h1, t1), Cons(h2, t2)) =>
         Some((Some(h1()) -> Some(h2())) -> (t1() -> t2()))
 
-  // def tails: LazyList[LazyList[A]] =
-  //   unfold(empty: LazyList[A])
+  def tails: LazyList[LazyList[A]] =
+    unfold(this):
+      case Empty      => None
+      case Cons(h, t) => Some((Cons(h, t), t()))
+    .append(LazyList(empty))
+
+  def scanRight[B](init: B)(f: (A, => B) => B): LazyList[B] =
+    foldRight(init -> LazyList(init)): (a, b0) =>
+      lazy val b1 = b0
+      val b2 = f(a, b1(0))
+      (b2, cons(b2, b1(1)))
+    .apply(1)
 
   def startsWith[A](prefix: LazyList[A]): Boolean =
     this.zipWith(prefix, (_, _)).forAll(_ == _)
@@ -172,7 +182,7 @@ object LazyList:
   val prefix = LazyList(1, 2, 3)
   val testll2 = LazyList("govno", "zalupa", "penis", "her", "davalka")
   val zipped = testll1.zipWith(testll2, (x, y) => (x, y))
-  println(testll1.startsWith(prefix))
+  println(testll1.tails.take(10).toList.foreach(x => x.toList.foreach(println)))
   // println(asd)
   // println(qwe)
   // println(zxc)
