@@ -29,9 +29,9 @@ nth	number	is	always	the	sum	of	the	previous	two—the	sequence	begins
 
   def fib2(n: Int): Int =
     @annotation.tailrec
-    def go(n: Int, current: Int, next: Int): Int =
+    def go(n: Int, current: Int, previous: Int): Int =
       if n <= 0 then current
-      else go(n - 1, next, current + next)
+      else go(n - 1, previous, current + previous)
     go(n, 0, 1)
   /*
         10, 1 + 0, 1
