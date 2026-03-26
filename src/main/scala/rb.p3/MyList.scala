@@ -12,32 +12,26 @@ object MyList {
     else Cons(as.head, apply(as.tail*))
   }
 
-  def head[A](as: MyList[A]): A = as match
-    case Nil           => throw IllegalStateException("Head of an empty list")
-    case Cons(head, _) => head
-
   def isEmpty[A](as: MyList[A]): Boolean = as match
     case Nil => true
     case _   => false
 
   def tail[A](as: MyList[A]): MyList[A] = as match
-    case Nil           => throw IllegalStateException("Tail of an empty list")
-    case Cons(h, Nil)  => throw IllegalStateException("Only head is present")
-    case Cons(_, tail) => tail
+    case Cons(_, tl) => tl
+    case Nil         => sys.error("tail	of	empty	list")
 
-  def setHead[A](as: MyList[A], newHead: A): MyList[A] = as match
-    case Nil              => Cons(newHead, Nil)
-    case Cons(head, tail) => Cons(newHead, tail)
+  def setHead[A](as: MyList[A], hd: A): MyList[A] = as match
+    case Cons(_, tl) => Cons(hd, tl)
+    case Nil         => sys.error("setHead	of	empty	list")
 
   def drop[A](as: MyList[A], n: Int): MyList[A] = as match
-    case Nil                         => Nil
-    case Cons(head, tail) if (n > 0) => drop(tail, n - 1)
-    case _                           => as
+    case Nil                      => Nil
+    case Cons(_, tail) if (n > 0) => drop(tail, n - 1)
+    case _                        => as
 
-  def dropWhile[A](as: MyList[A], predicate: A => Boolean): MyList[A] = as match
-    case Nil                                   => Nil
-    case Cons(head, tail) if (predicate(head)) => dropWhile(tail, predicate)
-    case _                                     => as
+  def dropWhile[A](as: MyList[A], f: A => Boolean): MyList[A] = as match
+    case Cons(hd, tl) if f(hd) => dropWhile(tl, f)
+    case _                     => as
 
   def sum(ints: MyList[Int]): Int = ints match
     case Nil         => 0
@@ -126,19 +120,16 @@ object MyList {
   }
 
   def init[A](as: MyList[A]): MyList[A] = as match
-    case Nil                      => Nil
-    case Cons(head, Cons(h, Nil)) => Cons(head, Nil)
-    case Cons(head, tail)         => Cons(head, init(tail))
+    case Nil          => sys.error("init	of	empty	list")
+    case Cons(_, Nil) => Nil
+    case Cons(hd, tl) => Cons(hd, init(tl))
 
   def foldRight[A, B](as: MyList[A], acc: B, f: (A, B) => B): B = as match
     case Nil              => acc
     case Cons(head, tail) => f(head, foldRight(tail, acc, f))
 
-  def foldRightViaFoldLeft[A, B](as: MyList[A], z: B, f: (A, B) => B): B = {
-    val seed: B => B             = identity
-    val g: (B => B, A) => B => B = (accFunc, a) => b => accFunc(f(a, b))
-    foldLeft(as, seed, g)(z)
-  }
+  def foldRightViaFoldLeft[A, B](as: MyList[A], acc: B, f: (A, B) => B): B =
+    foldLeft(reverse(as), acc, (b, a) => f(a, b))
 
   def foldLeft[A, B](as: MyList[A], acc: B, f: (B, A) => B): B = {
     @tailrec
