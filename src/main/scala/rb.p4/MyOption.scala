@@ -1,4 +1,5 @@
 package rb.p4
+import scala.annotation.tailrec
 
 enum Option[+A]:
   case Some(v: A)
@@ -30,6 +31,50 @@ enum Option[+A]:
 
   def lift[A, B](f: A => B): Option[A] => Option[B] =
     _.map(f)
+
+  def toIntOption(s: String): Option[Int] =
+    try Some(s.toInt)
+    catch case _: NumberFormatException => None
+
+  def insuranceRateQuote(age: Int, numberOfSpeedingTickets: Int): Double = ???
+
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a.flatMap: aa =>
+      b.map: bb =>
+        f(aa, bb)
+
+  def sequence[A](as: List[Option[A]]): Option[List[A]] = {
+    @tailrec
+    def go(acc: List[A], remaining: List[Option[A]]): Option[List[A]] = {
+      if (remaining.isEmpty) Some(acc.reverse)
+      else
+        remaining.head match
+          case Some(v) => go(v :: acc, remaining.tail)
+          case None    => None
+    }
+    go(List.empty, as)
+  }
+
+  def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = {
+    @tailrec
+    def go(remaining: List[A], acc: List[B]): Option[List[B]] = {
+      if (remaining.isEmpty) Some(acc)
+      else
+        f(remaining.head) match
+          case Some(v) => go(remaining.tail, v :: acc)
+          case None    => None
+    }
+    go(as, List.empty)
+  }
+
+  def sequenceViaTraverse[A](as: List[Option[A]]): Option[List[A]] =
+    traverse(as)(identity)
+
+  def parseInsuranceRateQuote(age: String, numberOfSpeedingTickets: String): Option[Double] =
+    val optAge: Option[Int]     = toIntOption(age)
+    val optTickets: Option[Int] = toIntOption(numberOfSpeedingTickets)
+
+    map2(optAge, optTickets)(insuranceRateQuote)
 
 object MyOption extends App {
   import Option.*
