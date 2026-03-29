@@ -51,6 +51,9 @@ object MyList {
   def appendViaFoldLeft[A](a1: MyList[A], a2: MyList[A]): MyList[A] =
     foldLeft(reverse(a1), a2, (acc, head) => Cons(head, acc))
 
+  def appendViaFoldRight[A](xs: MyList[A], ys: MyList[A]): MyList[A] =
+    foldRight(xs, ys, Cons(_, _))
+
   def concatLists[A](ll: MyList[MyList[A]]): MyList[A] =
     foldRight(ll, Nil: MyList[A], append)
 
@@ -62,6 +65,9 @@ object MyList {
 
     go(as, Nil)
   }
+
+  def mapViaFoldRight[A, B](as: MyList[A], f: A => B): MyList[B] =
+    foldRight(as, Nil: MyList[B], (a, acc) => Cons(f(a), acc))
 
   def filter[A](as: MyList[A], f: A => Boolean): MyList[A] = {
     @tailrec
@@ -97,6 +103,24 @@ object MyList {
       }
 
     go(as, bs)
+  }
+
+  def zipWithV2[A, B, C](a: MyList[A], b: MyList[B], f: (A, B) => C): MyList[C] = {
+    (a, b) match
+      case (Nil, _)                     => Nil
+      case (_, Nil)                     => Nil
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWithV2(t1, t2, f))
+  }
+
+  def zipWithTailRec[A, B, C](a: MyList[A], b: MyList[B], f: (A, B) => C): MyList[C] = {
+    @tailrec
+    def loop(a: MyList[A], b: MyList[B], acc: MyList[C]): MyList[C] = {
+      (a, b) match
+        case (Nil, _)                     => acc
+        case (_, Nil)                     => acc
+        case (Cons(h1, t1), Cons(h2, t2)) => loop(t1, t2, Cons(f(h1, h2), acc))
+    }
+    reverse(loop(a, b, Nil))
   }
 
   def flatMap[A, B](as: MyList[A], f: A => MyList[B]): MyList[B] = {
@@ -157,6 +181,17 @@ object MyList {
     if (isEmpty(as) || subseqLength == 0) false else go(as, searchedSubseq, 0)
   }
 
+  @tailrec
+  def startsWith[A](l: MyList[A], prefix: MyList[A]): Boolean = (l, prefix) match {
+    case (_, Nil)                              => true
+    case (Cons(h, t), Cons(h2, t2)) if h == h2 => startsWith(t, t2)
+    case _                                     => false
+  }
+
+  def hasSubsequenceV2[A](sup: MyList[A], sub: MyList[A]): Boolean = sup match
+    case Nil                       => sub == Nil
+    case _ if startsWith(sup, sub) => true
+
   def sumViaFoldLeft(ns: MyList[Int]): Int =
     foldLeft(ns, 0, _ + _)
 
@@ -183,5 +218,4 @@ object Test extends App {
   val newList  = MyList(3, 4)
 
   val test = appendViaFoldLeft(testList, newList)
-  println(hasSubsequence(MyList(1, 1, 2, 3), MyList(1, 2, 3)))
 }
