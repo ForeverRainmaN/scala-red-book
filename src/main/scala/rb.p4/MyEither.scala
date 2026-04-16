@@ -63,6 +63,12 @@ enum Either[+E, +A]:
         case (_, Left(e))          => Left(e)
     }
 
+  def traverseAll[E, A, B](
+      as: List[A],
+      f: A => Either[List[E], B]
+  ): Either[List[E], List[B]] =
+    as.foldRight(Right(Nil): Either[List[E], List[B]])((a, acc) => map2All(f(a), acc, _ :: _))
+
 object Either {
   def catchNonFatal[A](a: => A): Either[Throwable, A] =
     try Right(a)
