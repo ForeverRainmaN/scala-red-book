@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.iml" filepath="$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.main.iml" filepath="$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.scala-red-book-build.iml" filepath="$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.scala-red-book-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.test.iml" filepath="$PROJECT_DIR$/.idea/modules/scala-red-book/scala-red-book.test.iml" />
+    </modules>
+  </component>
+</project>
